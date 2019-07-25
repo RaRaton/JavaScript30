@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+<style>
+html {
+  font-size: 10px;
+  background: url(http://i.imgur.com/b9r5sEL.jpg) bottom center;
+  background-size: cover;
+}
+
+body,html {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+#keys {
+	display: flex;
+	flex: 1;
+  	min-height: 100vh;
+ 	align-items: center;
+  	justify-content: center;
+}
+
+
+
+.key {
+	margin: 10px;
+	padding: 10px;
+	border-color: black;
+	background-color: transparent;
+	border-radius: 0.3em;
+	border-width: 2px;
+	border-style: solid;
+	background: rgba(0,0,0,0.4);
+	transition: all .07s ease;
+	width: 50px;
+}
+
+.key:hover, .playing {
+	transform: scale(1.1);
+	border-color: #ffc600;
+	box-shadow: 0 0 1rem #ffc600;
+}
+
+.key p {
+	pointer-events: none;
+	margin: 0px;
+	text-align: center;
+}
+.letter {
+	font-size: 30px;
+	color: white;
+}
+
+.action {
+	color: yellow;
+	font-size: 10px;
+}
+
+
+</style>
+</head>
+<body>
+
+<div id="keys">
+	<div data-key="65" class="key">
+		<p class="letter">A</p>
+		<p class="action">CLAP</p>
+	</div>
+	<div data-key="83" class="key">
+		<p class="letter">S</p>
+		<p class="action">HIHAT</p>
+	</div>
+	<div data-key="68" class="key">
+		<p class="letter">D</p>
+		<p class="action">KICK</p>
+	</div>
+	<div data-key="70" class="key">
+		<p class="letter">F</p>
+		<p class="action">OPENHAT</p>
+	</div>
+	<div data-key="71" class="key">
+		<p class="letter">G</p>
+		<p class="action">BOOM</p>
+	</div>
+	<div data-key="72" class="key">
+		<p class="letter">H</p>
+		<p class="action">RIDE</p>
+	</div>
+	<div data-key="74" class="key">
+		<p class="letter">J</p>
+		<p class="action">SNARE</p>
+	</div>
+	<div data-key="75" class="key">
+		<p class="letter">K</p>
+		<p class="action">TOM</p>
+	</div>
+	<div data-key="76" class="key">
+		<p class="letter">L</p>
+		<p class="action">TINK</p>
+	</div>
+</div>
+
+<audio data-key="65" src="sounds/clap.wav"></audio>
+<audio data-key="83" src="sounds/hihat.wav"></audio>
+<audio data-key="68" src="sounds/kick.wav"></audio>
+<audio data-key="70" src="sounds/openhat.wav"></audio>
+<audio data-key="71" src="sounds/boom.wav"></audio>
+<audio data-key="72" src="sounds/ride.wav"></audio>
+<audio data-key="74" src="sounds/snare.wav"></audio>
+<audio data-key="75" src="sounds/tom.wav"></audio>
+<audio data-key="76" src="sounds/tink.wav"></audio>
+
+<script>
+	window.addEventListener('keydown', keyDownHandler);
+
+	function keyDownHandler(e){
+		playAudio(e.keyCode);
+		highlightKey(e.keyCode);
+	}
+
+	function keyPressedHandler(e){
+		var keyCode = e.target.getAttribute("data-key");
+		if (!keyCode) return; //Stop function if there is not keycode
+
+		playAudio(keyCode);//No need to call highlightKey because it is already highligthed by the mouse hover
+	}
+
+	function playAudio(keyCode){
+		const audio = document.querySelector('audio[data-key="'+ keyCode +'"]');
+		if (!audio) return; //Stop function if there is not audio
+		audio.currentTime = 0; //restart the audio before play
+		audio.play();
+	}
+
+	function highlightKey(keyCode){
+		const key = document.querySelector('div[data-key="'+ keyCode +'"]');
+		if (!key) return; //Stop function if there is not audio
+		
+		//key.addClass('playing'); //Same but using JQuery instead of vanillla js
+		key.classList.add('playing');
+	}
+
+	/*window.addEventListener('keyup', function(e){
+		unhighlightKey(e.keyCode);
+	});*/
+
+	function unhighlightKey(keyCode){
+		const key = document.querySelector('div[data-key="'+ keyCode +'"]');
+		if (!key) return; //Stop function if there is not audio
+		
+		//key.removeClass('playing'); //Same but using JQuery instead of vanillla js
+		key.classList.remove('playing');
+	}
+
+	function removeTransition(e){
+		//console.log(e);
+		if (e.propertyName !== 'transform') return; //Skip if it is not the end of the transition that we are interested in
+		
+		//This at this point is the key item because it the one that we added the event listener
+		this.classList.remove('playing');
+	}
+
+	const keys = document.querySelectorAll('.key');
+	keys.forEach(key => key.addEventListener('transitionend', removeTransition));
+	keys.forEach(key => key.addEventListener('click', keyPressedHandler));
+
+</script>	
+
+</body>
+</html>
